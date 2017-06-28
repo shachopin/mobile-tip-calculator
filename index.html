@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<!--
+    Copyright (c) 2012-2016 Adobe Systems Incorporated. All rights reserved.
+
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+     KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+-->
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="msapplication-tap-highlight" content="no" />
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width" />
+    <!-- This is a wide open CSP declaration. To lock this down for production, see below. -->
+    <!-- <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline'; style-src 'self' 'unsafe-inline'; media-src *" /> -->
+    <!-- Good default declaration:
+    * gap: is required only on iOS (when using UIWebView) and is needed for JS->native communication
+    * https://ssl.gstatic.com is required only on Android and is needed for TalkBack to function properly
+    * Disables use of eval() and inline scripts in order to mitigate risk of XSS vulnerabilities. To change this:
+        * Enable inline JS: add 'unsafe-inline' to default-src
+        * Enable eval(): add 'unsafe-eval' to default-src
+    * Create your own at http://cspisawesome.com
+    -->
+    <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: 'unsafe-inline' https://ssl.gstatic.com; style-src 'self' 'unsafe-inline'; media-src *" /> -->
+
+    
+    <title>Tip Calculator</title>
+    
+    <link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
+    <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+    <script type="text/javascript" src="cordova.js"></script>
+    <style>
+        #container
+        {
+            padding: 5px;
+        }
+        
+        [type=number]
+        {
+            font-size: 2.5em;
+        }
+        
+        #result
+        {
+            font-size: 2em;
+            font-weight: bold;
+            padding: 10px;
+            background-color: #eee;
+        }
+    </style>
+    <script>
+        window.onload = function()
+        {
+            $("#tipPercent").on('slidestop', calculateTip); //or something like document.getElementById('sss').addEventListener('click', doSomething, false);
+            $('#billAmount').on('change', calculateTip);
+            $('#numberOfPeople').on('change', calculateTip);
+            $('#result').hide();
+        }
+        
+        function calculateTip()
+        {        
+            if ($('#billAmount').val() === '') {
+              return;
+            }
+            $('#result').show();
+            var billAmount = $('#billAmount').val(); //or you can do document.getElementById('aaa').value;
+            var tipPercent = ($('#tipPercent').val())/100;
+            var tipAmount = billAmount * tipPercent;
+            var totalBill = parseFloat(billAmount) + parseFloat(tipAmount); //because the input field val is of type String, string will be concatenated, hence here you need to typecast to number
+            var eachPersonBill = totalBill / $('#numberOfPeople').val();
+            console.log(eachPersonBill);
+            
+            var out = "<p>Tip Amount: $" + tipAmount.toFixed(2) + "<br/>"
+            out += "Total Bill: $" + totalBill.toFixed(2) + "<br>";  // 2.366.toFixed(2) shows '2.37', which is a string
+            out += " Each Person: $" + eachPersonBill.toFixed(2) + "</p>"; 
+            $('#result').html(out);
+            
+            if(tipPercent > 0)
+            {
+                $('#result').css('border', '2px dashed red');
+               //or in pure javascript document.getElementById('result').style('border', '2px dashed red');
+            } 
+            
+            if (tipPercent > .125)
+            {
+                $('#result').css('border', '2px dashed yellow');
+            } 
+            
+            if (tipPercent > .175)
+            {
+                $('#result').css('border', '2px dashed green');
+            }
+            
+        }
+    </script>
+</head>
+
+<body>
+    <div id="container">
+      <h2>Tip Calculator</h2>
+      <input type="number" placeholder="Bill Amount" id="billAmount" />
+      <label for="tipPercent">Tip Percentage</label>
+      <input type="range" min="0" max="50" value="0" step="1" id="tipPercent" data-highlight="true" />
+      <label for="numberOfPeople">Number of People</label>
+      <input type="range" min="1" max="20" value="2" step="1" id="numberOfPeople" data-highlight="true" />
+      <div id="result"></div>
+    </div>
+</body>
+
+
+</html>
